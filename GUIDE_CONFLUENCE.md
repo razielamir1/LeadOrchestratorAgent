@@ -10,12 +10,17 @@
 2. [Prerequisites](#2-prerequisites)
 3. [Installation](#3-installation)
 4. [Your First Task](#4-your-first-task)
-5. [Working With Agents — Step by Step](#5-working-with-agents--step-by-step)
-6. [Advanced Workflows](#6-advanced-workflows)
-7. [Agent Reference Card](#7-agent-reference-card)
-8. [Memory System](#8-memory-system)
-9. [Customizing for Your Project](#9-customizing-for-your-project)
-10. [Troubleshooting](#10-troubleshooting)
+5. [Slash Commands](#5-slash-commands)
+6. [Working With Agents — Step by Step](#6-working-with-agents--step-by-step)
+7. [Advanced Workflows](#7-advanced-workflows)
+8. [Safety System](#8-safety-system)
+9. [Audit Report System](#9-audit-report-system)
+10. [Agent Reference Card](#10-agent-reference-card)
+11. [Memory System](#11-memory-system)
+12. [MCP — External Tool Integration](#12-mcp--external-tool-integration)
+13. [Context Efficiency](#13-context-efficiency)
+14. [Customizing for Your Project](#14-customizing-for-your-project)
+15. [Troubleshooting](#15-troubleshooting)
 
 ---
 
@@ -28,6 +33,8 @@ A system of **11 specialized AI agents** that work together as a complete develo
 - Read-only agents (QA, security, code review, architect) can never accidentally break your code
 - Agents maintain persistent memory — they learn your project over time
 - Heavy analysis happens in isolated agent contexts, keeping your main conversation clean
+- Safety hooks block destructive operations at the system level
+- Slash commands automate common workflows with a single command
 
 ---
 
@@ -38,7 +45,6 @@ A system of **11 specialized AI agents** that work together as a complete develo
 | Claude Code | Installed and authenticated |
 | VSCode | With Claude Code extension |
 | Git | For version control and subtree sync |
-| Node.js | If your project uses Node.js (for agents to run tests, builds, etc.) |
 
 ---
 
@@ -50,8 +56,8 @@ A system of **11 specialized AI agents** that work together as a complete develo
 2. Click **"Use this template"** → **"Create a new repository"**
 3. Clone your new repository locally
 4. Open it in VSCode
-5. Edit `CLAUDE.md` — update the **Tech Stack** section to match your project
-6. Done! Start chatting with Claude
+5. Type `/init-project` in the Claude chat — it auto-detects your tech stack and generates `CLAUDE.md`
+6. Done! Start working with the agents
 
 ### Step 3.2 — Existing Project (Recommended)
 
@@ -70,14 +76,12 @@ git fetch agents
 git subtree add --prefix=.claude agents main --squash
 ```
 
-**Step 3.2.4** — Copy and customize the orchestrator config:
-```bash
-cp .claude/../CLAUDE.md ./CLAUDE.md
-```
+**Step 3.2.4** — Open the project in VSCode and type `/init-project` in the Claude chat. The command will:
+- Scan your project for `package.json`, `requirements.txt`, `go.mod`, `docker-compose.yml`, etc.
+- Detect your frontend framework, backend framework, database, testing tools, and infrastructure
+- Generate a customized `CLAUDE.md` with the correct tech stack
 
-**Step 3.2.5** — Edit `CLAUDE.md` to match your project's tech stack.
-
-**Step 3.2.6** — Commit the changes:
+**Step 3.2.5** — Commit the changes:
 ```bash
 git add -A && git commit -m "Add Lead Orchestrator Agent system"
 ```
@@ -112,8 +116,8 @@ Build me a health check endpoint that returns the server status and database con
 The Lead Orchestrator will:
 1. Recognize this is a backend task
 2. Delegate to `backend-developer`
-3. The backend-developer will create the endpoint
-4. Optionally route to `qa-expert` to verify
+3. The backend-developer will present its plan and wait for you to type **PROCEED**
+4. After implementation, optionally route to `qa-expert` to verify
 
 ### Step 4.4 — Review the output
 
@@ -121,28 +125,59 @@ Each agent returns a summary of what it did. Review the changes, and if you're h
 
 ---
 
-## 5. Working With Agents — Step by Step
+## 5. Slash Commands
 
-### 5.1 — Automatic Delegation (Easiest)
+Slash commands are pre-built workflows that automate common multi-agent tasks.
+
+| Command | What It Does | Agents Involved |
+|---|---|---|
+| `/init-project` | Auto-detects tech stack and generates `CLAUDE.md` | Lead Orchestrator |
+| `/full-audit` | Runs full codebase audit, produces `FIXES.md` | qa + security + reviewer + perf → architect |
+| `/new-feature <desc>` | Builds a feature end-to-end | architect → db → backend → frontend → ui → qa |
+| `/fix-bug <desc>` | Diagnoses and fixes a bug | qa → dev agent → qa |
+| `/security-check` | Focused security vulnerability scan | security-analyst |
+| `/document <type>` | Generates documentation (api/readme/onboarding/jsdoc) | tech-writer |
+
+### How to use them
+
+Type the command directly in the Claude chat:
+
+```
+/new-feature User authentication with JWT tokens and password reset
+```
+
+```
+/fix-bug The checkout button is not responding on mobile devices
+```
+
+```
+/document api
+```
+
+---
+
+## 6. Working With Agents — Step by Step
+
+### 6.1 — Automatic Delegation (Easiest)
 
 **What:** Describe your task in natural language. The orchestrator picks the right agent(s).
 
 **How:**
 ```
-I need a user registration page with email validation and a PostgreSQL table to store users.
+I need a user registration page with email validation and a database table to store users.
 ```
 
 **What happens:**
-1. `database-expert` creates the `users` table and migration
-2. `backend-developer` creates `POST /api/users/register` endpoint
+1. `database-expert` creates the users table and migration
+2. `backend-developer` creates the registration endpoint
 3. `frontend-developer` builds the registration form logic
-4. `ui-designer` styles the form with TailwindCSS
+4. `ui-designer` styles the form
 
 **When to use:** Most of the time. This is the default way to work.
 
 ---
 
-### 5.2 — Direct Agent Invocation (@-mention)
+### 6.2 — Direct Agent Invocation (@-mention)
 
 **What:** Target a specific agent when you know exactly who should handle the task.
 
@@ -163,7 +198,7 @@ I need a user registration page with email validation and a PostgreSQL table to 
 
 ---
 
-### 5.3 — Parallel Execution
+### 6.3 — Parallel Execution
 
 **What:** Run multiple independent agents at the same time.
 
@@ -175,13 +210,15 @@ Run these in parallel:
 - @qa-expert check test coverage for src/api/
 ```
 
-**What happens:** All three agents run simultaneously. Each returns an independent report. No agent blocks another.
+Or simply use `/full-audit` to run all 4 audit agents in parallel automatically.
+
+**What happens:** All agents run simultaneously. Each writes its report to `.claude/audits/`. No agent blocks another.
 
 **When to use:** For audits, reviews, and any tasks that don't depend on each other.
 
 ---
 
-### 5.4 — Sequential Chaining
+### 6.4 — Sequential Chaining
 
 **What:** Run agents one after another, where each builds on the previous agent's work.
 
@@ -196,11 +233,13 @@ Build a complete user profile feature:
 6. @qa-expert — test everything
 ```
 
+Or use `/new-feature user profile page with avatar upload` to run the full pipeline automatically.
+
 **When to use:** For full-stack features where order matters.
 
 ---
 
-### 5.5 — Background Execution
+### 6.5 — Background Execution
 
 **What:** Run an agent in the background while you continue working.
 
@@ -217,7 +256,7 @@ Run @qa-expert in the background to scan the entire project for bugs
 
 ---
 
-### 5.6 — Viewing Available Agents
+### 6.6 — Viewing Available Agents
 
 **What:** See all agents and their descriptions.
 
@@ -227,23 +266,19 @@ Run @qa-expert in the background to scan the entire project for bugs
 
 ---
 
-## 6. Advanced Workflows
+## 7. Advanced Workflows
 
-### 6.1 — Full Feature Development
+### 7.1 — Full Feature Development
 
 **Scenario:** You need to build a complete "Shopping Cart" feature.
 
 ```
-I need a shopping cart feature:
-- Users can add/remove products
-- Cart persists across sessions
-- Checkout calculates total with tax
-- Responsive cart sidebar UI
+/new-feature Shopping cart - users can add/remove products, cart persists across sessions, checkout calculates total with tax, responsive sidebar UI
 ```
 
 **Agent flow:**
 ```
-architect          → Designs the overall approach
+architect          → Designs the overall approach (waits for PROCEED)
   ↓
 database-expert    → Creates cart_items table, indexes
   ↓
@@ -258,19 +293,17 @@ qa-expert          → Tests all flows, edge cases
 
 ---
 
-### 6.2 — Bug Investigation & Fix
+### 7.2 — Bug Investigation & Fix
 
 **Scenario:** Users report that checkout sometimes fails.
 
 ```
-Users are reporting intermittent checkout failures. Investigate and fix.
+/fix-bug Users are reporting intermittent checkout failures
 ```
 
 **Agent flow:**
 ```
-qa-expert              → Reproduces the bug, identifies the failing path
-  ↓
-security-analyst       → Checks if it's a security issue (parallel with above)
+qa-expert              → Diagnoses the bug, identifies root cause
   ↓
 backend-developer      → Fixes the root cause
   ↓
@@ -279,38 +312,95 @@ qa-expert              → Verifies the fix
 
 ---
 
-### 6.3 — Pre-Release Audit
+### 7.3 — Pre-Release Audit
 
 **Scenario:** You're about to release v2.0 and want a full quality check.
 
 ```
-Run a full pre-release audit on the entire codebase.
+/full-audit
 ```
 
 **Agent flow (all in parallel):**
 ```
-code-reviewer          → Code quality report
-security-analyst       → Security vulnerability report
-qa-expert              → Test coverage report
-performance-optimizer  → Performance bottleneck report
+code-reviewer          → AUDIT_CODE_REVIEW.md
+security-analyst       → AUDIT_SECURITY.md
+qa-expert              → AUDIT_QA.md
+performance-optimizer  → AUDIT_PERFORMANCE.md
+         ↓ (all complete)
+architect              → Reads all reports → FIXES.md
 ```
 
-All four reports come back independently. Review and address findings before release.
+Review `FIXES.md` and address findings before release.
 
 ---
 
-### 6.4 — Onboarding Documentation
+### 7.4 — Onboarding Documentation
 
 **Scenario:** A new developer is joining the team and needs documentation.
 
 ```
-@tech-writer create comprehensive onboarding documentation for this project,
-including: architecture overview, setup guide, API reference, and coding conventions.
+/document onboarding
 ```
 
 ---
 
-## 7. Agent Reference Card
+## 8. Safety System
+
+### 8.1 — Micro-Checkpoint Protocol (Prompt-Level)
+
+Agents with Write permissions must **PAUSE and present their action plan** before executing changes that involve:
+
+| Trigger | Example |
+|---|---|
+| 3+ file changes | Creating a new feature across multiple files |
+| Database migrations | Adding a new table or modifying a schema |
+| Configuration files | package.json, tsconfig, Dockerfile, CI/CD pipelines |
+| Auth logic | Login, JWT, session management, permissions |
+| Deletions | Removing files, endpoints, or functionality |
+
+The agent presents its plan and waits for the user to type **PROCEED** before executing.
+
+### 8.2 — Safety Hooks (System-Level)
+
+A `PreToolUse` hook in `.claude/settings.json` blocks dangerous operations at the technical level — not a prompt instruction, but actual enforcement:
+
+| Blocked Operation | What Gets Blocked |
+|---|---|
+| Destructive SQL | `DROP TABLE`, `TRUNCATE`, `DELETE FROM` |
+| Recursive deletes | `rm -rf`, `rm -r /` |
+| Force operations | `--force`, `--hard` |
+
+When an agent tries a blocked operation, it receives an error message and cannot proceed. This provides a safety net beyond the prompt-level checkpoints.
+
+---
+
+## 9. Audit Report System
+
+### How It Works
+
+Audit agents write their findings to files in `.claude/audits/` instead of returning them in the conversation. This prevents "context rot" — where hundreds of lines of logs flood the main chat and degrade AI performance.
+
+| Agent | Writes To |
+|---|---|
+| `qa-expert` | `.claude/audits/AUDIT_QA.md` |
+| `security-analyst` | `.claude/audits/AUDIT_SECURITY.md` |
+| `code-reviewer` | `.claude/audits/AUDIT_CODE_REVIEW.md` |
+| `performance-optimizer` | `.claude/audits/AUDIT_PERFORMANCE.md` |
+
+### Summarization
+
+After all audit agents complete, the `architect` agent reads all 4 reports and produces a unified `FIXES.md` at the project root:
+- Grouped by priority (critical → high → medium → low)
+- Deduplicated (overlapping findings merged)
+- Each fix assigned to the appropriate agent
+
+### Git Exclusion
+
+Audit reports are excluded from version control via `.gitignore`. They are temporary working documents, not permanent artifacts.
+
+---
+
+## 10. Agent Reference Card
 
 ### Agents That WRITE Code
 
@@ -324,18 +414,18 @@ including: architecture overview, setup guide, API reference, and coding convent
 | `performance-optimizer` | Profiling, caching, optimization | Speed improvements, bundle size |
 | `tech-writer` | Documentation, JSDoc | API docs, README, guides |
 
-### Agents That ADVISE Only (Read-Only)
+### Agents That ADVISE Only
 
 | Agent | Specialization | Output |
 |---|---|---|
-| `architect` | System design, scalability | Design documents, recommendations |
+| `architect` | System design, scalability | Design documents, recommendations, FIXES.md |
 | `code-reviewer` | Best practices, code quality | Review reports with severity levels |
 | `security-analyst` | OWASP, vulnerability scanning | Security audit reports |
 | `qa-expert` | Testing, bug hunting | Bug reports, coverage analysis |
 
 ---
 
-## 8. Memory System
+## 11. Memory System
 
 ### How It Works
 
@@ -372,24 +462,47 @@ If an agent didn't automatically save its findings:
 
 ---
 
-## 9. Customizing for Your Project
+## 12. MCP — External Tool Integration
 
-### Step 9.1 — Update Tech Stack
+MCP (Model Context Protocol) lets your agents access external systems. All MCP servers are configured in `.claude/settings.json`.
 
-Edit `CLAUDE.md` and change the Tech Stack section:
+### Available Integrations
 
-```markdown
-## Tech Stack
-- Frontend: Vue 3, TypeScript, Vuetify
-- Backend: Python, FastAPI
-- Database: MongoDB
-```
+| MCP Server | What It Provides | Best For |
+|---|---|---|
+| PostgreSQL | Direct database access | `@database-expert` reading schemas |
+| GitHub | PR, issue, and repo access | `@code-reviewer` reading PRs |
+| Slack | Channel messaging | Status updates and notifications |
+| Filesystem | Access to external directories | Reading shared docs or design assets |
 
-### Step 9.2 — Update Agent Prompts (Optional)
+See [MCP_SETUP.md](MCP_SETUP.md) for step-by-step setup instructions with configuration examples.
 
-If your stack is very different (e.g., Python instead of Node.js), update the agent prompts in `.claude/agents/` to match. For example, change `backend-developer.md` to reference FastAPI instead of Express.
+---
 
-### Step 9.3 — Add a New Agent
+## 13. Context Efficiency
+
+Subagents run in isolated contexts — their heavy processing stays in their own session and only a clean summary returns to the main conversation. This prevents context bloat and keeps costs down.
+
+**Best practices:**
+- Prefer delegating to agents over doing work inline
+- Use `/full-audit` instead of asking each audit agent individually — it routes reports to files, not the chat
+- For large codebases, target specific directories (e.g., "audit src/api/") rather than scanning everything
+
+---
+
+## 14. Customizing for Your Project
+
+### Step 14.1 — Auto-Detect Tech Stack
+
+Type `/init-project` in the Claude chat. It scans for:
+- `package.json`, `requirements.txt`, `go.mod`, `Cargo.toml`, `Gemfile`, `composer.json`
+- `docker-compose.yml`, `Dockerfile`, `.github/workflows/`
+- `tsconfig.json`, `tailwind.config.*`, `vite.config.*`
+- `prisma/schema.prisma`, `knexfile.*`, `.env`
+- `jest.config.*`, `vitest`, `cypress/`, `playwright/`
+- `pnpm-workspace.yaml`, `nx.json`, `turbo.json`
+
+### Step 14.2 — Add a New Agent
 
 Create a file in `.claude/agents/` with this structure:
 
@@ -416,20 +529,23 @@ When done, update it with new insights.
 - Specific rules for this agent
 ```
 
-Then create the memory directory:
+Then create the memory directory and file:
 ```bash
 mkdir -p .claude/agent-memory/my-new-agent
+echo "# My New Agent Memory" > .claude/agent-memory/my-new-agent/MEMORY.md
 ```
 
-And create an empty `MEMORY.md` in that directory.
+### Step 14.3 — Add a New Slash Command
 
-### Step 9.4 — Remove an Agent
+Create a file in `.claude/commands/` (e.g., `.claude/commands/my-command.md`). The file content is the prompt that runs when a user types `/my-command`. Use `$ARGUMENTS` to capture user input.
+
+### Step 14.4 — Remove an Agent
 
 Delete its file from `.claude/agents/` and optionally remove its memory directory.
 
 ---
 
-## 10. Troubleshooting
+## 15. Troubleshooting
 
 | Problem | Solution |
 |---|---|
@@ -439,7 +555,11 @@ Delete its file from `.claude/agents/` and optionally remove its memory director
 | Agent doesn't remember past context | Ask the agent to "read your memory file first", or check that the memory file path is correct in the agent prompt |
 | Agent response is too slow | Change `model: opus` to `model: sonnet` for faster responses (at the cost of depth) |
 | Subtree pull conflicts | Resolve merge conflicts in `.claude/` directory, keep your memory files |
-| Agent generates wrong tech stack code | Update the agent's `.md` file and `CLAUDE.md` to match your actual stack |
+| Agent generates wrong tech stack code | Run `/init-project` to re-detect your stack, or update agent prompts manually |
+| Slash command not found | Check that the `.md` file exists in `.claude/commands/` |
+| Safety hook blocks a valid operation | Edit `.claude/settings.json` to adjust the hook rules |
+| Audit reports not generated | Verify audit agents have `Write` in their `tools` field |
+| CLAUDE.md shows "(not detected)" | Run `/init-project` to auto-detect your tech stack |
 
 ---
 

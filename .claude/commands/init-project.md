@@ -20,22 +20,35 @@ Scan the project root for these files and infer the stack:
 - `Gemfile` → Ruby/Rails
 - `composer.json` → PHP/Laravel
 
-**Database:**
+**Database / BaaS:**
+- `supabase/` directory or `@supabase/supabase-js` in deps → Supabase (PostgreSQL + Auth + Storage + Realtime)
+- `firebase.json` / `@firebase` in deps → Firebase
+- `.env` / `.env.example` → look for SUPABASE_URL, DATABASE_URL, DB_HOST, MONGO_URI, NEON_DATABASE_URL
 - `docker-compose.yml` → check for postgres/mysql/mongo/redis services
-- `.env` / `.env.example` → look for DATABASE_URL, DB_HOST, MONGO_URI
 - `prisma/schema.prisma` → Prisma + detect DB
 - `knexfile.*` / `ormconfig.*` / `typeorm` in deps → ORM + detect DB
 - `sequelize` in deps → Sequelize
 - `drizzle.config.*` → Drizzle ORM
 - Migration directories → detect DB type
 
-**Infrastructure:**
-- `Dockerfile` → Docker
+**Hosting / Deployment:**
+- `vercel.json` or `next.config.*` → Vercel
+- `netlify.toml` → Netlify
+- `fly.toml` → Fly.io
+- `railway.toml` or `railway.json` → Railway
+- `render.yaml` → Render
+- `Dockerfile` → Docker (detect target platform from other configs)
 - `docker-compose.yml` → Docker Compose
+- `serverless.yml` / `serverless.ts` → Serverless Framework (AWS)
+- `wrangler.toml` → Cloudflare Workers/Pages
+- `app.yaml` → Google App Engine
+- `Procfile` → Heroku / Railway
+
+**CI/CD:**
 - `.github/workflows/` → GitHub Actions
-- `Jenkinsfile` → Jenkins
 - `.gitlab-ci.yml` → GitLab CI
-- `vercel.json` / `netlify.toml` → deployment platform
+- `Jenkinsfile` → Jenkins
+- `.circleci/config.yml` → CircleCI
 - `terraform/` / `*.tf` → Terraform
 - `k8s/` / `kubernetes/` → Kubernetes
 

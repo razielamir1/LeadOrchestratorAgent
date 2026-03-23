@@ -1,6 +1,11 @@
-1.1.0
+1.2.0
 
 ## Changelog
+
+### 1.2.0 (2026-03-23)
+- "Speak plainly" rule added to CLAUDE.md — all agents use simple everyday language with users
+- Planning agents avoid jargon: "login system" instead of "Auth", "first basic version" instead of "MVP"
+- Technical terms reserved for code and agent-to-agent handoffs only
 
 ### 1.1.0 (2026-03-23)
 - Interactive clarification: prompt-architect asks guiding questions before refining

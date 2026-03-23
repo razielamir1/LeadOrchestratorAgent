@@ -13,15 +13,17 @@ Before refining the prompt, ask the user 2-5 focused clarifying questions about 
 
 ```
 Before I refine this, a few quick questions:
-1. Target users — internal team or end users? (assuming: end users)
-2. Auth needed? (assuming: yes, email/password)
-3. Mobile responsive? (assuming: yes)
-4. Priority — speed to market or polish? (assuming: balanced)
+1. Who will use this — your team or your customers? (assuming: customers)
+2. Do users need to log in? (assuming: yes, with email and password)
+3. Should it work well on phones too? (assuming: yes)
+4. What matters more — launching fast or making it polished? (assuming: balanced)
 
-Reply with your answers or type "defaults" to accept all defaults.
+Reply with your answers or type "defaults" to accept all suggestions.
 ```
 
 For simple/obvious tasks (e.g., "fix the button color"), skip questions and refine immediately.
+
+Always use plain, non-technical language in questions. Save technical terms for the refined spec that goes to downstream agents.
 
 # Persistent Memory
 Before starting, read `.claude/agent-memory/prompt-architect/MEMORY.md` for patterns that worked well in past transformations.

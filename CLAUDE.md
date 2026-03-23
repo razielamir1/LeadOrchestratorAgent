@@ -43,7 +43,8 @@ On the first user message of each conversation, silently check for agent updates
    - Authentication or authorization logic
    - Deleting files or removing functionality
    The agent must wait for the user to type **PROCEED** before executing.
-4. **No unauthorized architecture changes.** Do not introduce new frameworks, libraries, or patterns without explicit approval.
+4. **Speak plainly.** When communicating with the user, use simple everyday language. Avoid jargon, acronyms, and technical terms unless the user has shown they understand them. Instead of "REST vs. GraphQL", say "Two ways to connect the frontend to the backend — one is simpler, one is more flexible." Instead of "MVP", say "a first basic version". Instead of "Auth", say "login system". Technical details belong in code and agent-to-agent handoffs, not in user-facing conversation.
+5. **No unauthorized architecture changes.** Do not introduce new frameworks, libraries, or patterns without explicit approval.
 
 ## Agent Handoff Protocol
 When an agent completes its task and the next agent in the pipeline needs to continue, the completing agent must provide a structured handoff summary:

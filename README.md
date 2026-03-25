@@ -77,6 +77,9 @@ Then type `/init-project` in Claude chat.
 | `/fix-bug <description>` | Diagnostic pipeline: qa → fix → qa verify |
 | `/security-check` | Focused security scan with report |
 | `/document <type>` | Generates docs (api / readme / onboarding / jsdoc) |
+| `/deploy [platform]` | Deployment pipeline: devops → qa → security → deploy |
+| `/review-pr <number>` | Code review + security analysis on a PR |
+| `/status` | Quick project health dashboard |
 | `/check-updates` | Checks for agent updates and offers to install them |
 | `/update-agents` | Pulls and installs the latest agent version |
 
@@ -277,6 +280,9 @@ your-project/
     │   ├── fix-bug.md                     # /fix-bug
     │   ├── security-check.md             # /security-check
     │   ├── document.md                    # /document
+    │   ├── deploy.md                    # /deploy
+    │   ├── review-pr.md                 # /review-pr
+    │   ├── status.md                    # /status
     │   ├── check-updates.md              # /check-updates
     │   └── update-agents.md              # /update-agents
     ├── audits/                            # Audit reports (git-ignored)

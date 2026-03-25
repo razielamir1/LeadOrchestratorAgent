@@ -135,5 +135,8 @@ Each subagent maintains persistent memory in `.claude/agent-memory/<agent-name>/
 | `/fix-bug <description>` | Diagnostic pipeline: qa → fix → qa verify |
 | `/security-check` | Focused security scan with report |
 | `/document <type>` | Generates docs (api / readme / onboarding / jsdoc) |
+| `/deploy [platform]` | Deployment pipeline: devops → qa → security → deploy |
+| `/review-pr <number>` | Code review + security analysis on a PR |
+| `/status` | Quick project health dashboard (tests, security, code quality, git) |
 | `/check-updates` | Checks for agent system updates and offers to install them |
 | `/update-agents` | Pulls and installs the latest agent version |

@@ -140,6 +140,9 @@ Slash commands are pre-built workflows that automate common multi-agent tasks.
 | `/fix-bug <desc>` | Diagnoses and fixes a bug | qa → dev agent → qa |
 | `/security-check` | Focused security vulnerability scan | security-analyst |
 | `/document <type>` | Generates documentation (api/readme/onboarding/jsdoc) | tech-writer |
+| `/deploy [platform]` | Full deployment pipeline | devops → qa → security |
+| `/review-pr <number>` | Code review + security scan on a PR | code-reviewer + security-analyst |
+| `/status` | Project health dashboard | qa + security (quick scan) |
 | `/check-updates` | Checks for agent system updates and offers to install | Lead Orchestrator |
 | `/update-agents` | Pulls and installs the latest agent version | Lead Orchestrator |
 

@@ -2,6 +2,12 @@
 
 ## Changelog
 
+### 1.8.0 (2026-03-25)
+- 3 new slash commands: /deploy, /review-pr, /status (11 total)
+- /deploy: full deployment pipeline (devops → qa → security → deploy)
+- /review-pr: code review + security analysis on a specific PR
+- /status: project health dashboard (tests, security, code quality, git)
+
 ### 1.7.0 (2026-03-25)
 - Token optimization: prompt-architect and code-reviewer downgraded from opus to sonnet
 - Token optimization: git-manager downgraded to haiku for simple git operations

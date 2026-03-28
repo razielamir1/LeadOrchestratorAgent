@@ -1,6 +1,9 @@
-1.9.0
+2.1.0
 
 ## Changelog
+
+### 2.1.0 (2026-03-27)
+- Smart Skill Suggestions: orchestrator detects repeating tasks and suggests custom slash commands
 
 ### 2.0.0 (2026-03-27)
 - Autonomy levels: users choose control level during /init-project (full control, semi-autonomous, fully autonomous)

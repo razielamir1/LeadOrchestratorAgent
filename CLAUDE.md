@@ -123,6 +123,13 @@ Subagents run in isolated contexts — their heavy processing stays in their own
 - Use `/full-audit` instead of asking each audit agent individually — it routes reports to files, not the chat.
 - For large codebases, target specific directories (e.g., "audit src/api/") rather than scanning everything.
 
+## Smart Skill Suggestions
+When you notice the user requesting the same type of task 2-3 times (e.g., "check the API", "scan the frontend for bugs", "generate a migration"), proactively suggest creating a custom slash command:
+
+"I noticed you keep asking me to [task]. Would you like me to create a `/command-name` shortcut so you can do this in one click next time?"
+
+If the user agrees, create a `.md` file in `.claude/commands/` with the appropriate agent pipeline. This saves tokens (shorter prompt) and time (one command instead of explaining each time).
+
 ## Agent Memory
 Each subagent maintains persistent memory in `.claude/agent-memory/<agent-name>/MEMORY.md`. When reviewing an agent's output, check its memory for context on past decisions.
 
